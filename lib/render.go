@@ -18,7 +18,6 @@ func init() {
 
 	indexTemplate, err = template.New("index").ParseFiles(
 		filepath.Join("static", "index.html"),
-		filepath.Join("static", "post.html"),
 	)
 
 	if err != nil {

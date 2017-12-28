@@ -13,3 +13,23 @@
     </body>
 </html>
 {{ end }}
+
+{{ define "post" }}
+{{ if .IsPost }}
+    <div class="post">
+        <p class="post-head">
+            [{{ .Score }}] <span class="name">{{ .User }}</span> says
+        </p>
+
+        <pre class="content">{{ .Content }}</pre>
+
+        <ul class="replies">
+            {{ range .Children }}
+                <li>{{ template "post" . }}</li>
+            {{ end }}
+        </ul>
+    </div>
+{{ else }}
+    <em>... max depth reached ...</em>
+{{ end }}
+{{ end }}
