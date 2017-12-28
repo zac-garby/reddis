@@ -1,0 +1,43 @@
+html, body {
+    font-family: monospace;
+    margin: 0;
+}
+
+h1 {
+    margin: 0;
+    padding: 20px;
+    width: 100vw;
+    height: 1em;
+    background-color: #eaeaea;
+}
+
+div.post {
+    margin-left: 20px;
+}
+
+p.post-head {
+    border-bottom: 0;
+}
+
+span.name {
+    font-weight: bold;
+}
+
+pre.content {
+    border-top: 0;
+}
+
+ul.replies {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 20px;
+    border-left: 3px solid grey;
+}
+
+ul.replies li div.post {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+ul.replies li:last-child div.post {
+    border-bottom: none;
+}
