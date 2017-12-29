@@ -14,13 +14,19 @@ func RenderIndex(w http.ResponseWriter, tree Node) error {
 }
 
 func init() {
-	var err error
+	loadTemplate("index", &indexTemplate)
+}
 
-	indexTemplate, err = template.New("index").ParseFiles(
-		filepath.Join("static", "index.html"),
+func loadTemplate(name string, tmpl **template.Template) {
+	t, err := template.New(name).ParseFiles(
+		filepath.Join("static", name+".html"),
+		filepath.Join("static", "nav.html"),
+		filepath.Join("static", "head.html"),
 	)
 
 	if err != nil {
 		panic(err)
 	}
+
+	(*tmpl) = t
 }
