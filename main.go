@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Zac-Garby/social/lib"
+	"github.com/Zac-Garby/reddis/lib"
 	"github.com/go-redis/redis"
 )
 
