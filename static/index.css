@@ -58,3 +58,11 @@ ul.replies li div.post {
 ul.replies li:last-child div.post {
     border-bottom: none;
 }
+
+div.post pre.max-depth {
+    padding-left: 20px;
+    cursor: pointer;
+    color: #8b1517;
+    text-decoration: underline;
+    font-style: italic;
+}

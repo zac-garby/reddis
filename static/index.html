@@ -6,12 +6,13 @@
         {{ template "nav" }}
         {{ template "post" . }}
     </body>
+    <script src="index.js" charset="utf-8"></script>
 </html>
 {{ end }}
 
 {{ define "post" }}
 {{ if .IsPost }}
-    <div class="post">
+    <div class="post" id="post-{{.ID}}">
         <p class="post-head">
             [{{ .Score }}] <span class="name">{{ .User }}</span> says
         </p>
@@ -25,6 +26,6 @@
         </ul>
     </div>
 {{ else }}
-    <em>... max depth reached ...</em>
+    <pre class="max-depth" id="depth-{{.ID}}" onclick="loadPosts({{.ID}})">load more posts</pre>
 {{ end }}
 {{ end }}

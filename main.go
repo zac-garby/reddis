@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/Zac-Garby/reddis/lib"
@@ -10,7 +11,7 @@ import (
 )
 
 const (
-	normalDepth = 8
+	normalDepth = 1
 )
 
 var (
@@ -31,6 +32,8 @@ func main() {
 	}
 
 	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/get_posts", getPostsHandler)
+
 	chttp.Handle("/", http.FileServer(http.Dir("./static/")))
 
 	fmt.Println("listening...")
@@ -50,5 +53,30 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		if err := lib.RenderIndex(w, tree); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+	}
+}
+
+func getPostsHandler(w http.ResponseWriter, r *http.Request) {
+	idParam := r.URL.Query().Get("id")
+
+	if len(idParam) == 0 {
+		fmt.Fprintf(w, "<pre>Could not load posts</pre>")
+		return
+	}
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		fmt.Fprintf(w, "<pre>Could not load posts - invalid post ID</pre>")
+		return
+	}
+
+	tree, err := lib.FetchPostTree(id, -1, rdb)
+	if err != nil {
+		fmt.Fprintf(w, "<pre>Could not load posts</pre>")
+		return
+	}
+
+	if err := lib.RenderPosts(w, tree); err != nil {
+		fmt.Fprintf(w, "<pre>Could not render posts</pre>")
 	}
 }
