@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	normalDepth = 1
+	normalDepth = 4
 )
 
 var (
