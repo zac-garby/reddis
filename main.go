@@ -36,8 +36,8 @@ func main() {
 
 	chttp.Handle("/", http.FileServer(http.Dir("./static/")))
 
-	fmt.Println("listening...")
-	http.ListenAndServe(":3000", nil)
+	fmt.Println("listening on https://localhost:3000")
+	http.ListenAndServeTLS(":3000", "server.crt", "server.key", nil)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
