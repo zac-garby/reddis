@@ -7,3 +7,9 @@ label {
     text-align: right;
     width: 60px;
 }
+
+p#message {
+    color: red;
+    display: inline-block;
+    width: 300px;
+}

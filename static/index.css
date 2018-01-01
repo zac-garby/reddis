@@ -69,3 +69,7 @@ div.post pre.max-depth {
     text-decoration: underline;
     font-style: italic;
 }
+
+div.hidden, div.hidden * {
+    display: none;
+}

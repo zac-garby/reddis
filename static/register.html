@@ -4,34 +4,33 @@
     <head>
         {{ template "head" "Register" }}
         <link rel="stylesheet" href="register.css">
+        <script src="sha512.min.js" charset="utf-8"></script>
+        <script src="register.js" charset="utf-8"></script>
     </head>
     <body>
         {{ template "nav" }}
-        <form class="register" method="post">
+        <form class="register" onsubmit="return beforeSubmit(this)" action="/register" method="post">
             <h1>Make a new account</h1>
-
-            <br>
-
+            <p id="message"></p>
             <p>
                 <label for="name">Name</label>
                 <input type="text" name="name" placeholder="alphanumeric, -, _">
             </p>
-
             <br>
-
             <p>
                 <label for="password">Password</label>
                 <input type="password" name="password">
             </p>
-
             <p>
                 <label for="password-repeat">Repeat</label>
                 <input type="password" name="password-repeat">
             </p>
-
             <br>
-
             <input type="submit" value="Submit">
+
+            <div class="hidden">
+                <input type="text" name="hash">
+            </div>
         </form>
     </body>
 </html>

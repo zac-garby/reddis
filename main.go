@@ -35,6 +35,7 @@ func main() {
 	http.HandleFunc("/register", registerHandler)
 
 	http.HandleFunc("/get_posts", getPostsHandler)
+	http.HandleFunc("/user_exists", userExistsHandler)
 
 	chttp.Handle("/", http.FileServer(http.Dir("./static/")))
 
@@ -59,8 +60,34 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
-	if err := lib.RenderRegister(w); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if r.Method == "GET" {
+		if err := lib.RenderRegister(w); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	} else if r.Method == "POST" {
+		var (
+			name = r.PostFormValue("name")
+			hash = r.PostFormValue("hash")
+		)
+
+		if len(name) == 0 {
+			http.Error(w, "name must be at least 1 character. got "+name, http.StatusBadRequest)
+			return
+		}
+
+		if len(hash) != 128 {
+			http.Error(w, fmt.Sprintf("hash must be exactly 128 characters long. got %d", len(hash)), http.StatusBadRequest)
+			return
+		}
+
+		if _, err := lib.NewUser(name, hash, rdb); err != nil {
+			http.Error(w, err.Error(), http.StatusNotAcceptable)
+			return
+		}
+
+		http.Redirect(w, r, "/", http.StatusFound)
+	} else {
+		http.Error(w, "unsupported method: "+r.Method, http.StatusMethodNotAllowed)
 	}
 }
 
@@ -87,4 +114,13 @@ func getPostsHandler(w http.ResponseWriter, r *http.Request) {
 	if err := lib.RenderPosts(w, tree); err != nil {
 		fmt.Fprintf(w, "<pre>Could not render posts</pre>")
 	}
+}
+
+func userExistsHandler(w http.ResponseWriter, r *http.Request) {
+	var (
+		name   = r.URL.Query().Get("name")
+		exists = lib.UserExists(name, rdb)
+	)
+
+	fmt.Fprintf(w, "%t", exists)
 }
