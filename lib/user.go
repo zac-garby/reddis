@@ -25,6 +25,14 @@ func FetchUser(id int, rdb *redis.Client) (*User, error) {
 		posts    []*Post
 	)
 
+	if !Exists(key, rdb) {
+		return nil, errors.New("fetch user: key doesn't exist")
+	}
+
+	if !Exists(postsKey, rdb) {
+		return nil, errors.New("fetch user: posts key doesn't exist")
+	}
+
 	user.ID = id
 
 	name, err := rdb.HGet(key, "name").Result()

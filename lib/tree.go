@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -70,6 +71,14 @@ func FetchPostTree(head, maxDepth int, rdb *redis.Client) (Node, error) {
 		childrenKey = fmt.Sprintf("%s:children", key)
 		p           = new(Post)
 	)
+
+	if !Exists(key, rdb) {
+		return nil, errors.New("fetch posts: key doesn't exist")
+	}
+
+	if !Exists(childrenKey, rdb) {
+		return nil, errors.New("fetch posts: children key doesn't exist")
+	}
 
 	p.ID = head
 
