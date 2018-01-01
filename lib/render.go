@@ -7,11 +7,19 @@ import (
 	"path/filepath"
 )
 
-var indexTemplate *template.Template
+var (
+	indexTemplate    *template.Template
+	registerTemplate *template.Template
+)
 
 // RenderIndex renders the index page with the given post tree.
 func RenderIndex(w http.ResponseWriter, tree Node) error {
 	return indexTemplate.Execute(w, tree)
+}
+
+// RenderRegister renders the register page.
+func RenderRegister(w http.ResponseWriter) error {
+	return registerTemplate.Execute(w, nil)
 }
 
 // RenderPosts renders the given post tree.
@@ -27,6 +35,7 @@ func RenderPosts(w http.ResponseWriter, tree Node) error {
 
 func init() {
 	loadTemplate("index", &indexTemplate)
+	loadTemplate("register", &registerTemplate)
 }
 
 func loadTemplate(name string, tmpl **template.Template) {

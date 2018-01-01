@@ -32,6 +32,8 @@ func main() {
 	}
 
 	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/register", registerHandler)
+
 	http.HandleFunc("/get_posts", getPostsHandler)
 
 	chttp.Handle("/", http.FileServer(http.Dir("./static/")))
@@ -53,6 +55,12 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		if err := lib.RenderIndex(w, tree); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+	}
+}
+
+func registerHandler(w http.ResponseWriter, r *http.Request) {
+	if err := lib.RenderRegister(w); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 

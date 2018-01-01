@@ -1,0 +1,38 @@
+{{ define "register" }}
+<!DOCTYPE html>
+<html>
+    <head>
+        {{ template "head" "Register" }}
+        <link rel="stylesheet" href="register.css">
+    </head>
+    <body>
+        {{ template "nav" }}
+        <form class="register" method="post">
+            <h1>Make a new account</h1>
+
+            <br>
+
+            <p>
+                <label for="name">Name</label>
+                <input type="text" name="name" placeholder="alphanumeric, -, _">
+            </p>
+
+            <br>
+
+            <p>
+                <label for="password">Password</label>
+                <input type="password" name="password">
+            </p>
+
+            <p>
+                <label for="password-repeat">Repeat</label>
+                <input type="password" name="password-repeat">
+            </p>
+
+            <br>
+
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>
+{{ end }}

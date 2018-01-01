@@ -1,0 +1,9 @@
+form {
+    text-align: center;
+}
+
+label {
+    display: inline-block;
+    text-align: right;
+    width: 60px;
+}
