@@ -41,7 +41,7 @@ func main() {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	if strings.Contains(r.URL.Path, ".") {
+	if strings.Contains(r.URL.Path, ".") { // HACK: Change this at some point
 		chttp.ServeHTTP(w, r)
 	} else {
 		tree, err := lib.FetchPostTree(0, normalDepth, rdb)
