@@ -76,10 +76,6 @@ func FetchPostTree(head, maxDepth int, rdb *redis.Client) (Node, error) {
 		return nil, errors.New("fetch posts: key doesn't exist")
 	}
 
-	if !Exists(childrenKey, rdb) {
-		return nil, errors.New("fetch posts: children key doesn't exist")
-	}
-
 	p.ID = head
 
 	content, err := rdb.HGet(key, "content").Result()
