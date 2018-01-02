@@ -2,6 +2,7 @@ package lib
 
 import (
 	"errors"
+	"fmt"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -47,7 +48,7 @@ func init() {
 
 func loadTemplate(name string, tmpl **template.Template) {
 	t, err := template.New(name).ParseFiles(
-		filepath.Join("static", name+".html"),
+		filepath.Join("static", fmt.Sprintf("%s/%s.html", name, name)),
 		filepath.Join("static", "nav.html"),
 		filepath.Join("static", "head.html"),
 	)
