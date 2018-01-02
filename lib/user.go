@@ -110,6 +110,25 @@ func FetchUser(id int, rdb *redis.Client) (*User, error) {
 	return user, nil
 }
 
+// FetchUserName fetches a user by its username.
+func FetchUserName(name string, rdb *redis.Client) (*User, error) {
+	if !UserExists(name, rdb) {
+		return nil, errors.New("fetch user: user doesn't exist")
+	}
+
+	uidString, err := rdb.HGet("usernames", name).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	uid, err := strconv.Atoi(uidString)
+	if err != nil {
+		return nil, err
+	}
+
+	return FetchUser(uid, rdb)
+}
+
 // UpdateUser updates a user in the database if it already exists, or creates a
 // new one if it doesn't.
 func UpdateUser(user *User, rdb *redis.Client) error {

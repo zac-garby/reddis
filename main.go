@@ -38,6 +38,7 @@ func main() {
 	r.HandleFunc("/", indexHandler)
 	r.HandleFunc("/register", registerHandler)
 	r.HandleFunc("/me", meHandler)
+	r.HandleFunc("/{name:~[^\\s]+}", userHandler)
 
 	// API
 	r.HandleFunc("/get_posts", getPostsHandler)
@@ -122,7 +123,28 @@ func meHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/user/%s", user.Name), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("/~%s", user.Name), http.StatusFound)
+}
+
+func userHandler(w http.ResponseWriter, r *http.Request) {
+	name := mux.Vars(r)["name"][1:]
+
+	if !lib.UserExists(name, rdb) {
+		// TODO: Add a better error message
+		http.Error(w, "user doesn't exist", http.StatusNotFound)
+		return
+	}
+
+	user, err := lib.FetchUserName(name, rdb)
+	if err != nil {
+		// TODO: Add a better error message
+		http.Error(w, "could not fetch user", http.StatusInternalServerError)
+		return
+	}
+
+	if err := lib.RenderUser(w, user); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func getPostsHandler(w http.ResponseWriter, r *http.Request) {

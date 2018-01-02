@@ -2,11 +2,29 @@
 <!DOCTYPE html>
 <html>
     <head>
-        {{ template "head" {{ .Name }} }}
+        {{ template "head" .Name }}
+        <link rel="stylesheet" href="/static/user.css">
     </head>
     <body>
-        <h1>{{ .Name }}</h1>
-        <h2>User #{{ .ID }}</h2>
+        {{ template "nav" }}
+        <div class="wrapper">
+            <h1>{{ .Name }}</h1>
+            <h2>User #{{ .ID }}</h2>
+            <br>
+
+            {{ if .Posts }}
+                <h2>Posts</h2>
+                <ul class="posts">
+                {{ range .Posts }}
+                    <li class="post">
+                        [{{ .Score }}] {{ .Content }}
+                    </li>
+                {{ end }}
+                </ul>
+            {{ else }}
+                <h2>No posts yet!</h2>
+            {{ end }}
+        </div>
     </body>
 </html>
 {{ end }}

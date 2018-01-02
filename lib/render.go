@@ -10,6 +10,7 @@ import (
 var (
 	indexTemplate    *template.Template
 	registerTemplate *template.Template
+	userTemplate     *template.Template
 )
 
 // RenderIndex renders the index page with the given post tree.
@@ -33,9 +34,15 @@ func RenderPosts(w http.ResponseWriter, tree Node) error {
 	return errors.New("render: couldn't find the post template")
 }
 
+// RenderUser renders a user's page.
+func RenderUser(w http.ResponseWriter, user *User) error {
+	return userTemplate.Execute(w, user)
+}
+
 func init() {
 	loadTemplate("index", &indexTemplate)
 	loadTemplate("register", &registerTemplate)
+	loadTemplate("user", &userTemplate)
 }
 
 func loadTemplate(name string, tmpl **template.Template) {
