@@ -196,6 +196,10 @@ func (u *User) NewSession(rdb *redis.Client) (string, error) {
 		return "", err
 	}
 
+	if _, err := rdb.HSet("sessions", id, u.ID).Result(); err != nil {
+		return "", err
+	}
+
 	return id, nil
 }
 

@@ -110,7 +110,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		// Set the session cookie
 		http.SetCookie(w, cookie)
 
-		http.Redirect(w, r, "/", http.StatusFound)
+		http.Redirect(w, r, "/me", http.StatusFound)
 	} else {
 		http.Error(w, "unsupported method: "+r.Method, http.StatusMethodNotAllowed)
 	}
