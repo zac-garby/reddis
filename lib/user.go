@@ -1,11 +1,21 @@
 package lib
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"math"
+	"math/rand"
 	"strconv"
+	"time"
 
 	"github.com/go-redis/redis"
+)
+
+const (
+	sessIDLength   = 32
+	sessIDChars    = "0123456789abcdef"
+	sessExpiryTime = time.Hour * 168 // 1 week
 )
 
 // A User is an in-memory user loaded from the database.
@@ -148,4 +158,79 @@ func UserExists(name string, rdb *redis.Client) bool {
 	}
 
 	return exists
+}
+
+// NewSession makes a new session for a user with a random 32-character hexadecimal
+// string as the session id. It returns the session id and any errors.
+func (u *User) NewSession(rdb *redis.Client) (string, error) {
+	var (
+		key    = fmt.Sprintf("user:%d:sessions", u.ID)
+		id     = GenerateSessionID()
+		expiry = time.Now().Add(sessExpiryTime).Unix()
+
+		member = redis.Z{
+			Score:  float64(expiry),
+			Member: id,
+		}
+	)
+
+	if _, err := rdb.ZAdd(key, member).Result(); err != nil {
+		return "", err
+	}
+
+	return id, nil
+}
+
+// GetSessions gets all current valid sessions of the user. It also purges the
+// out-of-date ones.
+func (u *User) GetSessions(rdb *redis.Client) ([]string, error) {
+	var (
+		key = fmt.Sprintf("user:%d:sessions", u.ID)
+		now = time.Now().Unix()
+	)
+
+	sessions, err := rdb.ZRangeByScore(key, redis.ZRangeBy{
+		Min: fmt.Sprintf("%v", now),
+		Max: fmt.Sprintf("%v", math.Inf(1)),
+	}).Result()
+
+	if err != nil {
+		return []string{}, err
+	}
+
+	return sessions, nil
+}
+
+// IsValidSession checks if the given session id is currently assigned to the user.
+// Since it calls GetSessions, it purges out-of-date sessions from the database.
+func (u *User) IsValidSession(id string, rdb *redis.Client) (bool, error) {
+	if len(id) != 32 {
+		return false, nil
+	}
+
+	sessions, err := u.GetSessions(rdb)
+	if err != nil {
+		return false, err
+	}
+
+	for _, sess := range sessions {
+		if sess == id {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+// GenerateSessionID generates a new session ID.
+// TODO: Use crypto/rand instead of math/rand
+func GenerateSessionID() string {
+	var id bytes.Buffer
+
+	for i := 0; i < sessIDLength; i++ {
+		char := sessIDChars[rand.Intn(len(sessIDChars)-1)]
+		id.WriteByte(char)
+	}
+
+	return id.String()
 }
