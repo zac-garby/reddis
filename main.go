@@ -8,6 +8,7 @@ import (
 
 	"github.com/Zac-Garby/reddis/lib"
 	"github.com/go-redis/redis"
+	"github.com/gorilla/mux"
 )
 
 const (
@@ -31,16 +32,23 @@ func main() {
 		panic(err)
 	}
 
-	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/register", registerHandler)
+	r := mux.NewRouter()
 
-	http.HandleFunc("/get_posts", getPostsHandler)
-	http.HandleFunc("/user_exists", userExistsHandler)
+	// Pages
+	r.HandleFunc("/", indexHandler)
+	r.HandleFunc("/register", registerHandler)
+	r.HandleFunc("/me", meHandler)
 
-	chttp.Handle("/", http.FileServer(http.Dir("./static/")))
+	// API
+	r.HandleFunc("/get_posts", getPostsHandler)
+	r.HandleFunc("/user_exists", userExistsHandler)
+
+	// Resources
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+	r.Handle("/favicon.ico", http.FileServer(http.Dir(".")))
 
 	fmt.Println("listening on https://localhost:3000")
-	http.ListenAndServeTLS(":3000", "server.crt", "server.key", nil)
+	http.ListenAndServeTLS(":3000", "server.crt", "server.key", r)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -105,6 +113,16 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Error(w, "unsupported method: "+r.Method, http.StatusMethodNotAllowed)
 	}
+}
+
+func meHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := lib.GetLoggedInUser(r, rdb)
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/user/%s", user.Name), http.StatusFound)
 }
 
 func getPostsHandler(w http.ResponseWriter, r *http.Request) {

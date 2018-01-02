@@ -1,0 +1,12 @@
+{{ define "user" }}
+<!DOCTYPE html>
+<html>
+    <head>
+        {{ template "head" {{ .Name }} }}
+    </head>
+    <body>
+        <h1>{{ .Name }}</h1>
+        <h2>User #{{ .ID }}</h2>
+    </body>
+</html>
+{{ end }}
