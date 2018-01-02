@@ -7,16 +7,14 @@ a database, but it will be empty. At the very least, you need to add a key calle
 `posts` which you can initialise to an empty set.
 
 As well as setting up the server, you'll need to create an SSL certificate, since
-Reddis wants to run on `https`, not `http`. To enable this, run these commands:
+Reddis wants to run on `https`, not `http`. To generate your certificate, go to
+the project directory and run:
 
 ```
-openssl genrsa -out server.key 2048
-openssl ecparam -genkey -name secp384r1 -out server.key
-openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
+go run generate_cert.go --host <your host; possibly localhost>
 ```
 
-This will generate two files, server.crt and server.key, in the directory. Now
-you can `$ go run main.go` to start up the server. When you connect to it in the
+Now you can `$ go run main.go` to start up the server. When you connect to it in the
 browser, it will probably tell you the site can't be trusted, but will also give
 you the option to go to it anyway. Do this once, and it shouldn't ask you again.
 

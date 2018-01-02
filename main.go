@@ -49,7 +49,7 @@ func main() {
 	r.Handle("/favicon.ico", http.FileServer(http.Dir(".")))
 
 	fmt.Println("listening on https://localhost:3000")
-	http.ListenAndServeTLS(":3000", "server.crt", "server.key", r)
+	http.ListenAndServeTLS(":3000", "cert.pem", "key.pem", r)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
