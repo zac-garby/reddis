@@ -80,10 +80,26 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if _, err := lib.NewUser(name, hash, rdb); err != nil {
+		user, err := lib.NewUser(name, hash, rdb)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotAcceptable)
 			return
 		}
+
+		sess, err := user.NewSession(rdb)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		cookie := &http.Cookie{
+			Name:   "session",
+			Secure: true,
+			Value:  sess,
+		}
+
+		// Set the session cookie
+		http.SetCookie(w, cookie)
 
 		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
