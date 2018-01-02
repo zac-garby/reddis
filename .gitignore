@@ -1,3 +1,2 @@
 dump.rdb
-*.crt
-*.key
+*.pem
