@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -233,4 +234,29 @@ func GenerateSessionID() string {
 	}
 
 	return id.String()
+}
+
+// GetUserFromSession gets the user identified by the session id.
+func GetUserFromSession(id string, rdb *redis.Client) (*User, error) {
+	uidString, err := rdb.HGet("sessions", id).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	uid, err := strconv.Atoi(uidString)
+	if err != nil {
+		return nil, err
+	}
+
+	return FetchUser(uid, rdb)
+}
+
+// GetLoggedInUser gets the logged in user using the 'session' cookie.
+func GetLoggedInUser(r *http.Request, rdb *redis.Client) (*User, error) {
+	sess, err := r.Cookie("session")
+	if err != nil {
+		return nil, err
+	}
+
+	return GetUserFromSession(sess.Value, rdb)
 }
