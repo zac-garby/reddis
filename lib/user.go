@@ -65,10 +65,6 @@ func FetchUser(id int, rdb *redis.Client) (*User, error) {
 		return nil, errors.New("fetch user: key doesn't exist")
 	}
 
-	if !Exists(postsKey, rdb) {
-		return nil, errors.New("fetch user: posts key doesn't exist")
-	}
-
 	user.ID = id
 
 	name, err := rdb.HGet(key, "name").Result()
@@ -83,31 +79,33 @@ func FetchUser(id int, rdb *redis.Client) (*User, error) {
 	}
 	user.PasswordHash = hash
 
-	postIDs, err := rdb.SMembers(postsKey).Result()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, pidString := range postIDs {
-		pid, err := strconv.Atoi(pidString)
+	if Exists(postsKey, rdb) {
+		postIDs, err := rdb.SMembers(postsKey).Result()
 		if err != nil {
 			return nil, err
 		}
 
-		node, err := FetchPostTree(pid, 1, rdb)
-		if err != nil {
-			return nil, err
+		for _, pidString := range postIDs {
+			pid, err := strconv.Atoi(pidString)
+			if err != nil {
+				return nil, err
+			}
+
+			node, err := FetchPostTree(pid, 1, rdb)
+			if err != nil {
+				return nil, err
+			}
+
+			post, ok := node.(*Post)
+			if !ok {
+				return nil, errors.New("fetch user: non-post from FetchPostTree")
+			}
+
+			posts = append(posts, post)
 		}
 
-		post, ok := node.(*Post)
-		if !ok {
-			return nil, errors.New("fetch user: non-post from FetchPostTree")
-		}
-
-		posts = append(posts, post)
+		user.Posts = posts
 	}
-
-	user.Posts = posts
 
 	return user, nil
 }
